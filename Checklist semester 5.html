@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StudyFlow - منصة إدارة المذاكرة الذكية - سمستر 5 (ترتيب جديد)</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #06b6d4, #2563eb);
+      margin: 0;
+      padding: 20px;
+      color: #0f172a;
+    }
+    h1 {
+      text-align: center;
+      color: #fff;
+      margin-bottom: 20px;
+    }
+    .stat {
+      background: #fff;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+    }
+    .countdown, .netdays {
+      font-size: 18px;
+      font-weight: bold;
+      color: #1e293b;
+    }
+    .subject {
+      background: #fff;
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 30px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+    .day { margin-bottom: 20px; }
+    .lecture-item { margin-bottom: 5px; }
+    .missed { color: red; font-weight: bold; }
+    .btn {
+      background-color: #ef4444;
+      color: white;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
+    .progress-bar-outer {
+      position: relative;
+      width: 100%;
+      height: 32px;
+      margin: 10px 0 18px 0;
+      background: #e2e8f0;
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    .progress-bar-inner {
+      transition: width 1s cubic-bezier(.5,1.5,.7,1);
+      height: 100%;
+      width: 0%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 18px;
+      color: #ffffff;
+    }
+    .progress-text {
+      width: 100%;
+      text-align: center;
+      letter-spacing: 2px;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.10);
+    }
+  </style>
+</head>
+<body>
+  <h1><i class="fas fa-graduation-cap"></i> StudyFlow - خطة سمستر 5</h1>
+  <div class="stat"><div class="countdown" id="countdown">⏳ جاري حساب الوقت المتبقي...</div></div>
+  <div class="stat"><div class="netdays" id="netdays">📅 جاري حساب أيام المذاكرة المتبقية...</div></div>
+  <button class="btn" onclick="resetProgress()">🔄 إعادة ضبط التقدم</button>
+  <div id="checklistContainer"></div>
+
+<script>
+const startDate = new Date("2025-07-02");
+const examDate = new Date("2025-07-14T10:00:00+03:00");
+
+function updateCountdown() {
+  const now = new Date();
+  const diff = examDate - now;
+
+  if (diff > 0) {
+    const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+    const countdownEl = document.getElementById("countdown");
+    if (countdownEl) countdownEl.textContent = `🕒 الوقت المتبقي حتى أول امتحان: ${days} يوم، ${hours} ساعة، ${minutes} دقيقة، ${seconds} ثانية`;
+  } else {
+    const countdownEl = document.getElementById("countdown");
+    if (countdownEl) countdownEl.textContent = "✅ الامتحانات قد بدأت بالفعل.";
+  }
+
+  const netDiff = new Date("2025-07-13T23:59:59+03:00") - now;
+  const netDaysLeft = Math.max(0, Math.floor(netDiff / (1000 * 60 * 60 * 24)));
+  const netdaysEl = document.getElementById("netdays");
+  if (netdaysEl) netdaysEl.textContent = `📅 أيام المذاكرة المتبقية (صافية): ${netDaysLeft} يوم`;
+}
+
+setInterval(updateCountdown, 1000);
+updateCountdown();
+
+function saveProgress(id, value) {
+  localStorage.setItem(id, value);
+}
+function getProgress(id) {
+  return localStorage.getItem(id) === 'true';
+}
+function resetProgress() {
+  if (confirm("هل أنت متأكد أنك تريد إعادة ضبط التقدّم؟")) {
+    localStorage.clear();
+    location.reload();
+  }
+}
+
+window.onload = function() {
+
+// ترتيب المواد حسب طلبك وعدد الأيام الأساسية فقط
+const subjects = [
+  {
+    name: "TOXO + Forensic",
+    numLectures: 22,
+    perDay: 4,
+    daysUsed: 3,
+    startOffset: 0
+  },
+  {
+    name: "PSYC + Behavior",
+    numLectures: 26,
+    perDay: 4,
+    daysUsed: 4,
+    startOffset: 3
+  },
+  {
+    name: "DERM + RLM + ANDRO + RADIO",
+    numLectures: 33,
+    perDay: 6,
+    daysUsed: 2,
+    startOffset: 7
+  },
+  {
+    name: "BMS",
+    numLectures: 17,
+    perDay: 6,
+    daysUsed: 3,
+    startOffset: 9
+  }
+];
+
+const today = new Date();
+
+function render() {
+  const container = document.getElementById("checklistContainer");
+  container.innerHTML = "";
+  subjects.forEach(subject => {
+    const div = document.createElement("div");
+    div.className = "subject";
+    let totalDone = 0;
+    const total = subject.numLectures;
+    let lectureNum = 0;
+    let innerHTML = `<h2>${subject.name}</h2>`;
+
+    // Progress Bar
+    innerHTML += `
+    <div class="progress-bar-outer">
+      <div id="progbar_${subject.name}" class="progress-bar-inner">
+        <span id="perc_text_${subject.name}" class="progress-text"></span>
+      </div>
+    </div>`;
+
+    // توزيع الأيام وعدد المحاضرات في اليوم
+    innerHTML += `<div>✅ عدد المحاضرات: ${total} | 🗓️ أيام: ${subject.daysUsed}</div>`;
+
+    for (let i = 0; i < subject.daysUsed; i++) {
+      const dayDate = new Date(startDate);
+      dayDate.setDate(dayDate.getDate() + subject.startOffset + i);
+      const dayKey = dayDate.toISOString().split('T')[0];
+      const isToday = dayDate.toDateString() === today.toDateString();
+      const dayBackground = isToday ? '#bbf7d0' : '#f1f5f9';
+      const pinIcon = isToday ? '📍 ' : '';
+
+      innerHTML += `<div class="day" style="background:${dayBackground};padding:16px;border-radius:12px;margin-top:16px;box-shadow:0 2px 6px rgba(0,0,0,0.05);">
+        <div style="font-weight:bold;margin-bottom:8px;color:#2563eb;">${pinIcon}📅 ${dayKey}</div>`;
+
+      for (let j = 0; j < subject.perDay && lectureNum < total; j++) {
+        const id = `${subject.name}_L${lectureNum + 1}`;
+        const checked = getProgress(id);
+        if (checked) totalDone++;
+        innerHTML += `<label class="lecture-item">
+          <input type="checkbox" ${checked ? 'checked' : ''} onchange="saveProgress('${id}', this.checked); updateProgress()">
+          محاضرة ${lectureNum + 1}
+        </label><br>`;
+        lectureNum++;
+      }
+
+      if (today > dayDate) {
+        let missed = false;
+        for (let k = lectureNum - subject.perDay; k < lectureNum && k >= 0 && k < total; k++) {
+          if (!getProgress(`${subject.name}_L${k + 1}`)) missed = true;
+        }
+        if (missed) innerHTML += `<div class="missed">❌ لم تُستكمل</div>`;
+      }
+      innerHTML += `</div>`;
+    }
+
+    div.innerHTML = innerHTML;
+    container.appendChild(div);
+
+    setTimeout(() => {
+      let percent = total === 0 ? 0 : Math.round((totalDone / total) * 100);
+      let bar = document.getElementById(`progbar_${subject.name}`);
+      let percentTextLocal = document.getElementById(`perc_text_${subject.name}`);
+      if (bar && percentTextLocal) {
+        bar.style.width = percent + '%';
+        if (percent < 30) {
+          bar.style.background = '#ef4444';
+        } else if (percent < 70) {
+          bar.style.background = '#f59e0b';
+        } else {
+          bar.style.background = '#10b981';
+        }
+        percentTextLocal.style.color = '#ffffff';
+        percentTextLocal.textContent = `${percent}%`;
+      }
+    }, 0);
+  });
+}
+function updateProgress() {
+  render();
+}
+
+render();
+
+}; // نهاية window.onload
+
+</script>
+</body>
+</html>
