@@ -239,9 +239,10 @@ function render() {
     }, 0);
   });
 }
-function updateProgress() {
+// Expose updateProgress globally so inline handlers can access it
+window.updateProgress = function() {
   render();
-}
+};
 
 render();
 
