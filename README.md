@@ -1,6 +1,6 @@
 # Checklist Project
 
-This repo contains a simple HTML checklist.
+This repo contains a simple HTML checklist. Open `index.html` in your browser to view the checklist interface.
 
 ## Running Tests
 
