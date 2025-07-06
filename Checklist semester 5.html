@@ -161,9 +161,10 @@ const subjects = [
   }
 ];
 
-const today = new Date();
+// const today = new Date();
 
 function render() {
+  const today = new Date();
   const container = document.getElementById("checklistContainer");
   container.innerHTML = "";
   subjects.forEach(subject => {
