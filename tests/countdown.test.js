@@ -4,7 +4,7 @@ const { JSDOM } = require('jsdom');
 
 describe('updateCountdown', () => {
   test('updates countdown and netdays text', () => {
-    const html = fs.readFileSync(path.join(__dirname, '..', 'Checklist semester 5.html'), 'utf8');
+    const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
 
     const dom = new JSDOM(html, { runScripts: 'dangerously' });
     const { window } = dom;
